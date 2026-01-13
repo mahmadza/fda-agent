@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.DS_Store
+dist/
+.venv/
+/data/raw_pdfs/*
+!/data/raw_pdfs/.gitkeep
+/data/processed/*
+/data/reference/*

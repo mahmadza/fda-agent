@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "fda-agent"
+version = "0.1.0"
+description = "FDA Molecule Intelligence Agent"
+authors = ["Muhammad Zabidi <mamduh.zabidi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pymupdf = "^1.26.7"
+pydantic = "^2.12.5"
+rich = "^14.2.0"
+rapidfuzz = "^3.14.3"
+ollama = "^0.6.1"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^9.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

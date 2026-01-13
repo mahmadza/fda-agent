@@ -1,6 +1,6 @@
 import ollama
 import json
-from typing import Optional, Union
+from typing import Optional
 from src.schema import DocumentChunk, Fact, ConfidenceLevel, Citation
 from src.verifier import QuoteVerifier
 

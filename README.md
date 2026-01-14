@@ -4,7 +4,8 @@ A local-first AI pipeline that extracts verified medical facts from FDA drug lab
 
 ## 🚀 Key Features
 * **Local Privacy:** Runs entirely offline using `ollama`. No data leaves your machine.
-* **Dual-Engine Storage:** * **Relational (SQLite):** Stores high-fidelity facts, audit trails, and performance metrics.
+* **Dual-Engine Storage:**
+    * **Relational (SQLite):** Stores high-fidelity facts, audit trails, and performance metrics.
     * **Semantic (ChromaDB):** Enables conceptual search (e.g., "Find drugs with renal risks") using vector embeddings.
 * **Hallucination Guardrails:** A deterministic `QuoteVerifier` ensures every extracted fact is backed by an exact substring match in the source text.
 * **Audit Trail:** Every LLM thought, prompt, and latency metric is logged for full reproducibility.
@@ -35,18 +36,21 @@ The system follows a two-stage RAG (Retrieval-Augmented Generation) pipeline:
 3. **Usage Flow**
 
     **Step 1: Extract Facts**
+
     Process your PDFs to populate the SQLite audit store.
     ```bash
     poetry run python -m src.main data/raw_pdfs/keytruda.pdf
     ```
 
     **Step 2: Build Knowledge Base (New)**
+
     Convert extracted facts into semantic vectors for searching.
     ```bash
     poetry run python -m src.scripts.build_knowledge_base
     ```
 
     **Step 3: Semantic Query**
+
     Ask the agent conceptual questions.
     ```bash
     poetry run python -m src.scripts.query_agent

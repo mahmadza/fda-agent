@@ -35,10 +35,12 @@ We maintain two distinct databases to balance reliability with searchability:
 | **Integrity** | ACID Compliant | Approximate Nearest Neighbor |
 
 ### Schema Details
-* **SQLite:** * `runs`: Extraction session metadata.
+* **SQLite:**
+    * `runs`: Extraction session metadata.
     * `facts`: Verified molecule data points + citations.
     * `interactions`: Raw prompt/response logs for audit trails.
-* **ChromaDB (`fda_facts` collection):** * `document`: Combined Fact + Context string.
+* **ChromaDB (`fda_facts` collection):**
+    * `document`: Combined Fact + Context string.
     * `metadata`: `{ "attribute": str, "confidence": str, "fact_id": int }`.
 
 ---

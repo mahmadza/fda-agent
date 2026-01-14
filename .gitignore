@@ -7,3 +7,4 @@ dist/
 !/data/raw_pdfs/.gitkeep
 /data/processed/*
 /data/reference/*
+data/

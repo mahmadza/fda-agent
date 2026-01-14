@@ -31,29 +31,29 @@ def main():
         console.print(f"[bold red]File not found: {pdf_path}[/bold red]")
         sys.exit(1)
 
-    # 1. Ingestion
+    # Ingest PDF
     with console.status(f"[bold green]Ingesting {pdf_path.name}...[/bold green]"):
         chunks = ingest_pdf(pdf_path)
     console.print(f"✅ Ingested [bold]{len(chunks)}[/bold] text chunks.")
 
-    # 2. Setup
+    # Set up retriever
     retriever = KeywordRetriever(chunks)
-    agent = ExtractionAgent() # Loads Mistral-Nemo (might take a second)
+    agent = ExtractionAgent(model_name="qwen2:1.5b") # Loads model (might take a second)
     
     sections = []
 
-    # 3. Extraction Loop
+    #Extraction loop
     console.print("\n[bold blue]Starting Extraction Pipeline...[/bold blue]")
     
     for title, question in TARGET_SECTIONS.items():
         console.print(f"  🔍 Analyzing: [cyan]{title}[/cyan]...")
         
-        # A. Retrieve relevant chunks
+        # Retrieve relevant chunks
         relevant_chunks = retriever.retrieve(title + " " + question, top_k=3)
         
         section_facts = []
         
-        # B. Extract from each chunk
+        # Extract from each chunk
         for chunk in relevant_chunks:
             fact = agent.extract_fact(chunk, question)
             if fact and fact.value != "NOT_FOUND":

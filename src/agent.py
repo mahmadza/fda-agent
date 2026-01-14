@@ -5,7 +5,8 @@ from src.schema import DocumentChunk, Fact, ConfidenceLevel, Citation
 from src.verifier import QuoteVerifier
 
 class ExtractionAgent:
-    def __init__(self, model_name: str = "mistral-nemo"):
+    # Change default from "mistral-nemo" to "llama3.1"
+    def __init__(self, model_name: str = "llama3.1"):
         self.model_name = model_name
         self.verifier = QuoteVerifier(threshold=85)
 

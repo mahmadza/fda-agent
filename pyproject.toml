@@ -12,6 +12,9 @@ pydantic = "^2.12.5"
 rich = "^14.2.0"
 rapidfuzz = "^3.14.3"
 ollama = "^0.6.1"
+matplotlib = "^3.10.8"
+chromadb = "^1.4.0"
+sentence-transformers = "^5.2.0"
 
 
 [tool.poetry.group.dev.dependencies]

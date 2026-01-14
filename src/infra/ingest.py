@@ -1,7 +1,7 @@
-import fitz  # PyMuPDF
+import fitz
 from pathlib import Path
 from typing import List
-from src.schema import DocumentChunk
+from src.core.schema import DocumentChunk
 
 def ingest_pdf(file_path: Path) -> List[DocumentChunk]:
     doc = fitz.open(file_path)
@@ -12,7 +12,6 @@ def ingest_pdf(file_path: Path) -> List[DocumentChunk]:
     for page_index, page in enumerate(doc):
         text_blocks = page.get_text("blocks")
         
-        # New cleaning logic:
         valid_text = []
         for b in text_blocks:
             # b[6] is block_type (0=text). b[4] is the text content.
@@ -50,7 +49,7 @@ if __name__ == "__main__":
     
     print(f"Extracted {len(result_chunks)} chunks.")
     
-    # Improved Preview: Show Page 2 (often denser text) instead of Page 1
+    # Preview: Show Page 2 (often denser text) instead of Page 1
     # and only show the first 500 characters
     if len(result_chunks) > 1:
         sample_chunk = result_chunks[1] 

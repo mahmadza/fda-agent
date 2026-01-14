@@ -1,5 +1,5 @@
 import pytest
-from src.verifier import QuoteVerifier
+from src.core.verifier import QuoteVerifier
 
 @pytest.fixture
 def verifier():

@@ -3,14 +3,13 @@ from enum import Enum
 from typing import List
 from pydantic import BaseModel, Field
 
-# --- Enums ---
+
 class ConfidenceLevel(str, Enum):
     HIGH = "high"
     MEDIUM = "medium"
     LOW = "low"
     UNKNOWN = "unknown"
 
-# --- Core Models ---
 class Citation(BaseModel):
     doc_id: str
     page_number: int

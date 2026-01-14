@@ -5,6 +5,22 @@ class QuoteVerifier:
         self.threshold = threshold
 
     def verify(self, source_text: str, quote: str) -> dict:
+        """
+        Verify if the quote is present in the source_text using fuzzy matching.
+        Returns a dict with verification result and score.
+        Uses different strategies based on quote length:
+        1. STRICT Physical Constraint
+        2. Exact Match
+        3. Smart Fuzzy Matching
+
+        Uses fuzzy matching (Levensthein distance) to allow for minor discrepancies
+        while rejecting hallucinated or unrelated quotes.
+
+        Returns:
+            dict: {'is_verified': bool, 'score': float}
+
+        """
+        
         if not quote or not source_text:
             return {
                 "is_verified": False,

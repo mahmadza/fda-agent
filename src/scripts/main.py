@@ -1,27 +1,22 @@
 import sys
+import time
 import argparse
 from pathlib import Path
 from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.status import Status
+from src.infra.ingest import ingest_pdf
+from src.infra.retriever import KeywordRetriever
+from src.core.agent import ExtractionAgent
+from src.core.schema import Section
+from src.infra.store import AuditStore
+import random
 
-from src.ingest import ingest_pdf
-from src.retriever import KeywordRetriever
-from src.agent import ExtractionAgent
-from src.schema import Section
+from src.config import Config
+
 
 console = Console()
 
-# Configuration: What we want to know
-TARGET_SECTIONS = {
-    "Indications": "What diseases or conditions is this drug indicated to treat?",
-    "Dosage": "What is the recommended dosage and schedule?",
-    "Contraindications": "Who should NOT take this drug? List contraindications.",
-    "Warnings": "What are the most serious warnings or boxed warnings?"
-}
-
 def main():
+
     parser = argparse.ArgumentParser(description="FDA Molecule Intelligence Agent")
     parser.add_argument("pdf_path", help="Path to the FDA label PDF")
     args = parser.parse_args()
@@ -31,38 +26,55 @@ def main():
         console.print(f"[bold red]File not found: {pdf_path}[/bold red]")
         sys.exit(1)
 
-    # Ingest PDF
     with console.status(f"[bold green]Ingesting {pdf_path.name}...[/bold green]"):
         chunks = ingest_pdf(pdf_path)
     console.print(f"✅ Ingested [bold]{len(chunks)}[/bold] text chunks.")
 
-    # Set up retriever
+    store = AuditStore()
+    
+    # Use the fixed seed from Config
+    run_seed = Config.SEED
+    model_name = Config.DEFAULT_MODEL
+
+    run_id = store.start_run(
+        filename=pdf_path.name, 
+        model_name=model_name, 
+        seed=run_seed
+    )
+    
+    console.print(f"💾 Log Init. ID: [cyan]{run_id}[/cyan] | Seed: [magenta]{run_seed}[/magenta]")
+
     retriever = KeywordRetriever(chunks)
-    agent = ExtractionAgent(model_name="qwen2:1.5b") # Loads model (might take a second)
+    
+    agent = ExtractionAgent(
+        model_name=model_name, 
+        store=store, 
+        run_id=run_id, 
+        seed=run_seed
+    )
     
     sections = []
 
-    #Extraction loop
     console.print("\n[bold blue]Starting Extraction Pipeline...[/bold blue]")
     
-    for title, question in TARGET_SECTIONS.items():
+    pipeline_start = time.perf_counter()
+
+    for title, question in Config.TARGET_SECTIONS.items():
         console.print(f"  🔍 Analyzing: [cyan]{title}[/cyan]...")
+        section_start = time.perf_counter()
         
-        # Retrieve relevant chunks
         relevant_chunks = retriever.retrieve(title + " " + question, top_k=3)
-        
         section_facts = []
         
-        # Extract from each chunk
         for chunk in relevant_chunks:
             fact = agent.extract_fact(chunk, question)
             if fact and fact.value != "NOT_FOUND":
                 section_facts.append(fact)
-                # Optimization: If we found a high confidence fact, maybe stop? 
-                # For now, we collect all and let the user see them.
 
-        # C. Create Section Object
-        # In a real app, we would deduplicate facts here.
+        section_duration = time.perf_counter() - section_start
+        store.log_section_stats(run_id, title, section_duration, len(relevant_chunks))
+        console.print(f"     ⏱️  Finished in [yellow]{section_duration:.2f}s[/yellow]")
+
         section = Section(
             title=title,
             facts=section_facts,
@@ -70,7 +82,9 @@ def main():
         )
         sections.append(section)
 
-    # 4. Final Report
+    total_duration = time.perf_counter() - pipeline_start
+    console.print(f"\n✅ Pipeline completed in [bold green]{total_duration:.2f}s[/bold green]")
+
     console.print("\n")
     console.rule(f"[bold]Molecule Brief: {pdf_path.stem}[/bold]")
     
@@ -81,7 +95,6 @@ def main():
             continue
             
         for fact in sec.facts:
-            # Color code confidence
             color = "green" if fact.confidence.value == "high" else "yellow"
             console.print(f"• {fact.value} [{color}]({fact.confidence.value})[/{color}]")
             for cit in fact.citations:

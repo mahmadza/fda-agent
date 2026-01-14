@@ -1,5 +1,5 @@
 from typing import List
-from src.schema import DocumentChunk
+from src.core.schema import DocumentChunk
 
 class KeywordRetriever:
     def __init__(self, chunks: List[DocumentChunk]):

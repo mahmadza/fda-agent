@@ -1,6 +1,6 @@
 # test_agent.py (Quick manual check)
-from src.ingest import ingest_pdf
-from src.agent import ExtractionAgent
+from src.infra.ingest import ingest_pdf
+from src.core.agent import ExtractionAgent
 from pathlib import Path
 
 # Load chunks
